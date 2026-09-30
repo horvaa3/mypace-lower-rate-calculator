@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>myPACE Lower Rate Calculator</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 550px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+    }
+
+    .container {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .height-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .height-group div {
+        flex: 1;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .calculate-btn {
+        background-color: #0078D4;
+    }
+
+    .calculate-btn:hover {
+        background-color: #005A9E;
+    }
+
+    .reset-btn {
+        background-color: #6c757d;
+    }
+
+    .reset-btn:hover {
+        background-color: #545b62;
+    }
+
+    .result {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .rate {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #0078D4;
+    }
+
+    .height-used {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    .note {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #666;
+        line-height: 1.4;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>myPACE Lower Rate Calculator</h2>
+
+    <label for="ef">Ejection Fraction (EF %)</label>
+    <input
+        type="number"
+        id="ef"
+        min="1"
+        max="100"
+        step="1"
+        inputmode="numeric"
+        placeholder="Enter EF (%)"
+        required>
+
+    <label>Height</label>
+
+    <div class="height-group">
+        <div>
+            <input
+                type="number"
+                id="feet"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                placeholder="Feet">
+        </div>
+
+        <div>
+            <input
+                type="number"
+                id="inches"
+                min="0"
+                max="11"
+                step="1"
+                inputmode="numeric"
+                placeholder="Inches">
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button class="calculate-btn" onclick="calculateRate()">
+            Calculate
+        </button>
+
+        <button class="reset-btn" onclick="resetForm()">
+            Reset
+        </button>
+    </div>
+
+    <div class="result">
+        <div class="rate" id="result">
+            Personalized Lower Rate: --
+        </div>
+
+        <div class="height-used" id="heightUsed"></div>
+    </div>
+
+    <div class="note">
+        Height inputs are limited to 4'8" through 6'6".<br>
+        Personalized lower rates are limited to 60-100 bpm.
+    </div>
+
+    <div class="note" style="margin-top:20px;">
+        Disclaimer: This calculator is intended for educational and
+        clinical reference purposes only. Results should be interpreted
+        within the context of clinical judgment, applicable product
+        labeling, and institutional protocols.
+    </div>
+
+    <div class="note">
+        Version 1.0
+    </div>
+
+</div>
+
+<script>
+
+function calculateRate() {
+
+    const ef = parseFloat(document.getElementById('ef').value);
+    const feet = parseInt(document.getElementById('feet').value) || 0;
+    const inches = parseInt(document.getElementById('inches').value) || 0;
+
+    if (isNaN(ef)) {
+        document.getElementById('result').innerText =
+            'Please enter a valid EF value.';
+        document.getElementById('heightUsed').innerText = '';
+        return;
+    }
+
+    if (ef < 1 || ef > 100) {
+        document.getElementById('result').innerText =
+            'EF must be between 1% and 100%.';
+        document.getElementById('heightUsed').innerText = '';
+        return;
+    }
+
+    if (inches < 0 || inches > 11) {
+        document.getElementById('result').innerText =
+            'Inches must be between 0 and 11.';
+        document.getElementById('heightUsed').innerText = '';
+        return;
+    }
+
+    let totalInches = (feet * 12) + inches;
+
+    const minHeight = 56; // 4'8"
+    const maxHeight = 78; // 6'6"
+
+    let adjustmentMessage = '';
+
+    if (totalInches < minHeight) {
+        totalInches = minHeight;
+        adjustmentMessage =
+            'Input height below minimum. Using 4\'8".';
+    }
+
+    if (totalInches > maxHeight) {
+        totalInches = maxHeight;
+        adjustmentMessage =
+            'Input height above maximum. Using 6\'6".';
+    }
+
+    const usedFeet = Math.floor(totalInches / 12);
+    const usedInches = totalInches % 12;
+
+    const heightCm = totalInches * 2.54;
+
+    const personalizedLowerRate =
+        ((heightCm * -0.3744) + 134.82) *
+        Math.sqrt(Math.sqrt(ef / 50));
+
+    let finalRate = Math.round(personalizedLowerRate);
+
+    // Limit personalized lower rate to 60–100 bpm
+    finalRate = Math.max(60, Math.min(100, finalRate));
+
+    document.getElementById('result').innerText =
+        `Personalized Lower Rate: ${finalRate} bpm`;
+
+    let heightText =
+        `Height used: ${usedFeet}'${usedInches}"`;
+
+    if (adjustmentMessage !== '') {
+        heightText += ` (${adjustmentMessage})`;
+    }
+
+    document.getElementById('heightUsed').innerText =
+        heightText;
+}
+
+function resetForm() {
+
+    document.getElementById('ef').value = '';
+    document.getElementById('feet').value = '';
+    document.getElementById('inches').value = '';
+
+    document.getElementById('result').innerText =
+        'Personalized Lower Rate: --';
+
+    document.getElementById('heightUsed').innerText = '';
+}
+
+// Allow Enter key to calculate
+document.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        calculateRate();
+    }
+});
+
+</script>
+
+</body>
+</html>
