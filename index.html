@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>myPACE Lower Rate Calculator</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #444;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.height-group {
+    display: flex;
+    gap: 10px;
+}
+
+.height-group div {
+    flex: 1;
+}
+
+.toggle-container {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-top: 15px;
+margin-bottom: 15px;
+gap: 12px;
+}
+ 
+.toggle-label {
+font-size: 16px;
+font-weight: 600;
+color: #444;
+}
+ 
+.switch {
+position: relative;
+display: inline-block;
+width: 60px;
+height: 34px;
+}
+ 
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+ 
+.slider {
+position: absolute;
+inset: 0;
+cursor: pointer;
+background-color: #0078D4;
+transition: .3s;
+border-radius: 34px;
+}
+ 
+.slider:before {
+position: absolute;
+content: "";
+height: 26px;
+width: 26px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: .3s;
+border-radius: 50%;
+}
+ 
+input:checked + .slider {
+background-color: #28a745;
+}
+ 
+input:checked + .slider:before {
+transform: translateX(26px);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+button {
+    flex: 1;
+    padding: 16px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.calculate-btn {
+    background-color: #0078D4;
+    color: white;
+}
+
+.calculate-btn:hover {
+    background-color: #005A9E;
+}
+
+.reset-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.reset-btn:hover {
+    background-color: #545b62;
+}
+
+.result {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.rate-number {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #0078D4;
+    line-height: 1;
+}
+
+.rate-label {
+    font-size: 1.1rem;
+    color: #444;
+    margin-top: 5px;
+}
+
+.height-used {
+    margin-top: 15px;
+    color: #555;
+    font-size: 1rem;
+}
+
+.note {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+
+    .height-group {
+        flex-direction: column;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .rate-number {
+        font-size: 4.5rem;
+    }
+
+    button {
+        width: 100%;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>myPACE Lower Rate Calculator</h2>
+
+    <label for="ef">Ejection Fraction (EF %)</label>
+    <input
+        type="number"
+        id="ef"
+        min="1"
+        max="100"
+        step="1"
+        inputmode="numeric"
+        placeholder="Enter EF (%)">
+
+    <label>Height</label>
+
+    <div class="height-group">
+        <div>
+            <input
+                type="number"
+                id="feet"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                placeholder="Feet">
+        </div>
+
+        <div>
+            <input
+                type="number"
+                id="inches"
+                min="0"
+                max="11"
+                step="1"
+                inputmode="numeric"
+                placeholder="Inches">
+        </div>
+    </div>
+
+    <label>Mode</label>
+
+<label>Mode</label>
+ 
+<div class="toggle-container">
+ 
+<span class="toggle-label">Current</span>
+ 
+<label class="switch">
+<input
+type="checkbox"
+id="modeToggle">
+<span class="slider"></span>
+</label>
+ 
+<span class="toggle-label">Vitalis</span>
+ 
+</div>
+
+    <div class="button-group">
+
+        <button
+            class="calculate-btn"
+            onclick="calculateRate()">
+            Calculate
+        </button>
+
+        <button
+            class="reset-btn"
+            onclick="resetForm()">
+            Reset
+        </button>
+
+    </div>
+
+    <div class="result">
+
+        <div
+            class="rate-number"
+            id="rateNumber">
+            --
+        </div>
+
+        <div class="rate-label">
+            Personalized Lower Rate (bpm)
+        </div>
+
+        <div
+            class="height-used"
+            id="heightUsed">
+        </div>
+
+    </div>
+
+    <div class="note">
+        Version 1.1
+    </div>
+
+</div>
+
+<script>
+
+function calculateRate() {
+
+    const ef = parseFloat(
+        document.getElementById('ef').value
+    );
+
+    const feet = parseInt(
+        document.getElementById('feet').value
+    ) || 0;
+
+    const inches = parseInt(
+        document.getElementById('inches').value
+    ) || 0;
+
+    if (isNaN(ef)) {
+        document.getElementById('rateNumber').innerText = '--';
+        document.getElementById('heightUsed').innerText =
+            'Please enter a valid EF value.';
+        return;
+    }
+
+    if (ef < 1 || ef > 100) {
+        document.getElementById('rateNumber').innerText = '--';
+        document.getElementById('heightUsed').innerText =
+            'EF must be between 1% and 100%.';
+        return;
+    }
+
+    if (inches < 0 || inches > 11) {
+        document.getElementById('rateNumber').innerText = '--';
+        document.getElementById('heightUsed').innerText =
+            'Inches must be between 0 and 11.';
+        return;
+    }
+
+    let totalInches = (feet * 12) + inches;
+
+    const minHeight = 56; // 4'8"
+    const maxHeight = 78; // 6'6"
+
+    let adjustmentMessage = '';
+
+    if (totalInches < minHeight) {
+        totalInches = minHeight;
+        adjustmentMessage =
+            'Input height below minimum. Using 4\'8".';
+    }
+
+    if (totalInches > maxHeight) {
+        totalInches = maxHeight;
+        adjustmentMessage =
+            'Input height above maximum. Using 6\'6".';
+    }
+
+    const usedFeet = Math.floor(totalInches / 12);
+    const usedInches = totalInches % 12;
+
+    const heightCm = totalInches * 2.54;
+
+    const personalizedLowerRate =
+        ((heightCm * -0.3744) + 134.82) *
+        Math.sqrt(Math.sqrt(ef / 50));
+
+const selectedMode =
+document.getElementById('modeToggle').checked
+? 'vitalis'
+: 'current';
+
+    let finalRate;
+
+    if (selectedMode === 'current') {
+
+        finalRate =
+            Math.round(personalizedLowerRate / 5) * 5;
+
+    } else {
+
+        finalRate =
+            Math.round(personalizedLowerRate);
+
+    }
+
+    finalRate = Math.max(
+        60,
+        Math.min(100, finalRate)
+    );
+
+    document.getElementById('rateNumber').innerText =
+        finalRate;
+
+    const modeLabel =
+        selectedMode.charAt(0).toUpperCase() +
+        selectedMode.slice(1);
+
+    let heightText =
+        `Calculation Height: ${usedFeet}'${usedInches}" | Mode: ${modeLabel}`;
+
+    if (adjustmentMessage !== '') {
+        heightText += ` (${adjustmentMessage})`;
+    }
+
+    document.getElementById('heightUsed').innerText =
+        heightText;
+}
+
+function resetForm() {
+
+    document.getElementById('ef').value = '';
+    document.getElementById('feet').value = '';
+    document.getElementById('inches').value = '';
+
+    document.getElementById('rateNumber').innerText =
+        '--';
+
+    document.getElementById('heightUsed').innerText =
+        '';
+
+    document.getElementById('modeToggle').checked = false;
+}
+
+document.addEventListener('keypress', function(event) {
+
+    if (event.key === 'Enter') {
+        calculateRate();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
