@@ -54,63 +54,6 @@ input {
     flex: 1;
 }
 
-.toggle-container {
-display: flex;
-justify-content: center;
-align-items: center;
-margin-top: 15px;
-margin-bottom: 15px;
-gap: 12px;
-}
- 
-.toggle-label {
-font-size: 16px;
-font-weight: 600;
-color: #444;
-}
- 
-.switch {
-position: relative;
-display: inline-block;
-width: 60px;
-height: 34px;
-}
- 
-.switch input {
-opacity: 0;
-width: 0;
-height: 0;
-}
- 
-.slider {
-position: absolute;
-inset: 0;
-cursor: pointer;
-background-color: #0078D4;
-transition: .3s;
-border-radius: 34px;
-}
- 
-.slider:before {
-position: absolute;
-content: "";
-height: 26px;
-width: 26px;
-left: 4px;
-bottom: 4px;
-background-color: white;
-transition: .3s;
-border-radius: 50%;
-}
- 
-input:checked + .slider {
-background-color: #28a745;
-}
- 
-input:checked + .slider:before {
-transform: translateX(26px);
-}
-
 .button-group {
     display: flex;
     gap: 10px;
@@ -240,24 +183,9 @@ button {
         </div>
     </div>
 
-    <label>Mode</label>
-
-<label>Mode</label>
- 
-<div class="toggle-container">
- 
-<span class="toggle-label">Current</span>
- 
-<label class="switch">
-<input
-type="checkbox"
-id="modeToggle">
-<span class="slider"></span>
-</label>
- 
-<span class="toggle-label">Vitalis</span>
- 
-</div>
+    <div class="note">
+        Valid Height Range: 4'8" - 6'6"
+    </div>
 
     <div class="button-group">
 
@@ -295,7 +223,19 @@ id="modeToggle">
     </div>
 
     <div class="note">
-        Version 1.1
+        Height inputs are limited to 4'8" through 6'6".<br>
+        Personalized lower rates are limited to 60–100 bpm.
+    </div>
+
+    <div class="note">
+        Disclaimer: This calculator is intended for educational and
+        clinical reference purposes only. Results should be interpreted
+        within the context of clinical judgment, applicable product
+        labeling, and institutional protocols.
+    </div>
+
+    <div class="note">
+        Version 1.0
     </div>
 
 </div>
@@ -365,24 +305,9 @@ function calculateRate() {
         ((heightCm * -0.3744) + 134.82) *
         Math.sqrt(Math.sqrt(ef / 50));
 
-const selectedMode =
-document.getElementById('modeToggle').checked
-? 'vitalis'
-: 'current';
-
-    let finalRate;
-
-    if (selectedMode === 'current') {
-
-        finalRate =
-            Math.round(personalizedLowerRate / 5) * 5;
-
-    } else {
-
-        finalRate =
-            Math.round(personalizedLowerRate);
-
-    }
+    let finalRate = Math.round(
+        personalizedLowerRate
+    );
 
     finalRate = Math.max(
         60,
@@ -392,12 +317,8 @@ document.getElementById('modeToggle').checked
     document.getElementById('rateNumber').innerText =
         finalRate;
 
-    const modeLabel =
-        selectedMode.charAt(0).toUpperCase() +
-        selectedMode.slice(1);
-
     let heightText =
-        `Calculation Height: ${usedFeet}'${usedInches}" | Mode: ${modeLabel}`;
+        `Calculation Height: ${usedFeet}'${usedInches}"`;
 
     if (adjustmentMessage !== '') {
         heightText += ` (${adjustmentMessage})`;
@@ -418,8 +339,6 @@ function resetForm() {
 
     document.getElementById('heightUsed').innerText =
         '';
-
-    document.getElementById('modeToggle').checked = false;
 }
 
 document.addEventListener('keypress', function(event) {
