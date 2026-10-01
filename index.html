@@ -54,6 +54,23 @@ input {
     flex: 1;
 }
 
+.mode-group {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.mode-group label {
+    display: inline-block;
+    margin: 0 15px;
+    font-weight: normal;
+}
+
+.mode-group input {
+    width: auto;
+    margin-right: 5px;
+}
+
 .button-group {
     display: flex;
     gap: 10px;
@@ -182,7 +199,28 @@ button {
                 placeholder="Inches">
         </div>
     </div>
-    
+
+    <label>Mode</label>
+
+    <div class="mode-group">
+        <label>
+            <input
+                type="radio"
+                name="mode"
+                value="current">
+            Current
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="mode"
+                value="vitalis"
+                checked>
+            Vitalis
+        </label>
+    </div>
+
     <div class="button-group">
 
         <button
@@ -219,7 +257,12 @@ button {
     </div>
 
     <div class="note">
-        Version 1.0
+        Height inputs are limited to 4'8" through 6'6".<br>
+        Personalized lower rates are limited to 60-100 bpm.
+    </div>
+
+    <div class="note">
+        Version 1.1
     </div>
 
 </div>
@@ -289,9 +332,24 @@ function calculateRate() {
         ((heightCm * -0.3744) + 134.82) *
         Math.sqrt(Math.sqrt(ef / 50));
 
-    let finalRate = Math.round(
-        personalizedLowerRate
-    );
+    const selectedMode =
+        document.querySelector(
+            'input[name="mode"]:checked'
+        ).value;
+
+    let finalRate;
+
+    if (selectedMode === 'current') {
+
+        finalRate =
+            Math.round(personalizedLowerRate / 5) * 5;
+
+    } else {
+
+        finalRate =
+            Math.round(personalizedLowerRate);
+
+    }
 
     finalRate = Math.max(
         60,
@@ -301,8 +359,12 @@ function calculateRate() {
     document.getElementById('rateNumber').innerText =
         finalRate;
 
+    const modeLabel =
+        selectedMode.charAt(0).toUpperCase() +
+        selectedMode.slice(1);
+
     let heightText =
-        `Calculation Height: ${usedFeet}'${usedInches}"`;
+        `Calculation Height: ${usedFeet}'${usedInches}" | Mode: ${modeLabel}`;
 
     if (adjustmentMessage !== '') {
         heightText += ` (${adjustmentMessage})`;
@@ -323,6 +385,10 @@ function resetForm() {
 
     document.getElementById('heightUsed').innerText =
         '';
+
+    document.querySelector(
+        'input[value="vitalis"]'
+    ).checked = true;
 }
 
 document.addEventListener('keypress', function(event) {
